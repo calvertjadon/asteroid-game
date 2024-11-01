@@ -1,10 +1,8 @@
 import pygame
 from asteriod import Asteroid
 from asteroidfield import AsteroidField
-from constants import (
-    SCREEN_WIDTH,
-    SCREEN_HEIGHT,
-)
+from constants import COLOR_FOREGROUND, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BACKGROUND
+from manager import GameManager
 from player import Player
 from shot import Shot
 
@@ -34,6 +32,12 @@ def main():
 
     dt = 0
 
+    font = pygame.font.SysFont(None, 24)
+
+    screen.fill(COLOR_BACKGROUND)
+    greeting = font.render("hello", True, COLOR_FOREGROUND)
+    screen.blit(greeting, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -52,7 +56,7 @@ def main():
                     asteroid.split()
                     bullet.kill()
 
-        screen.fill((0, 0, 0))
+        screen.fill(COLOR_BACKGROUND)
 
         for obj in drawable:
             obj.draw(screen)
@@ -62,5 +66,10 @@ def main():
         dt = clock.tick(60) / 1000
 
 
+def main2():
+    game = GameManager(SCREEN_WIDTH, SCREEN_HEIGHT)
+    game.start_game()
+
+
 if __name__ == "__main__":
-    main()
+    main2()

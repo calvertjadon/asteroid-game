@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 # Base class for game objects
 class CircleShape(pygame.sprite.Sprite, ABC):
-    def __init__(self, x, y, radius):
+    def __init__(self, x: float, y: float, radius: float):
         # we will be using this later
         if hasattr(self, "containers"):
             super().__init__(self.containers)  # type: ignore
@@ -16,10 +16,10 @@ class CircleShape(pygame.sprite.Sprite, ABC):
         self.radius = radius
 
     @abstractmethod
-    def draw(self, screen) -> None: ...
+    def draw(self, screen: pygame.Surface) -> None: ...
 
     @abstractmethod
-    def update(self, dt) -> None: ...
+    def update(self, dt: float) -> None: ...
 
     def is_colliding(self, other: "CircleShape") -> bool:
         distance = self.position.distance_to(other.position)

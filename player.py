@@ -1,7 +1,9 @@
+from typing import Sequence
 import pygame
 
 from circleshape import CircleShape
 from constants import (
+    COLOR_PLAYER,
     PLAYER_SHOOT_COOLDOWN,
     PLAYER_SHOOT_SPEED,
     PLAYER_SPEED,
@@ -13,7 +15,9 @@ from shot import Shot
 
 
 class Player(CircleShape):
-    def __init__(self, x, y):
+    containers: Sequence[pygame.sprite.Group]
+
+    def __init__(self, x: float, y: float):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_timer = 0
@@ -27,10 +31,10 @@ class Player(CircleShape):
         c = self.position - forward * self.radius + right  # type: ignore
         return [a, b, c]
 
-    def draw(self, screen) -> None:
-        pygame.draw.polygon(screen, (255, 255, 255), self.triangle(), 2)
+    def draw(self, screen: pygame.Surface) -> None:
+        pygame.draw.polygon(screen, COLOR_PLAYER, self.triangle(), 2)
 
-    def update(self, dt) -> None:
+    def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
 
         self.shoot_timer -= dt
@@ -46,10 +50,10 @@ class Player(CircleShape):
         if keys[pygame.K_SPACE]:
             self.shoot()
 
-    def rotate(self, dt):
+    def rotate(self, dt: float):
         self.rotation += PLAYER_TURN_SPEED * dt
 
-    def move(self, dt):
+    def move(self, dt: float):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         self.position += forward * PLAYER_SPEED * dt
 

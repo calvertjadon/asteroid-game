@@ -1,18 +1,21 @@
+from typing import Sequence
 import pygame
 import random
 
 from circleshape import CircleShape
-from constants import ASTEROID_MIN_RADIUS
+from constants import ASTEROID_MIN_RADIUS, COLOR_ASTEROID
 
 
 class Asteroid(CircleShape):
+    containers: Sequence[pygame.sprite.Group]
+
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
 
     def draw(self, screen) -> None:
         pygame.draw.circle(
             surface=screen,
-            color=(255, 255, 255),
+            color=COLOR_ASTEROID,
             center=self.position,
             radius=self.radius,
             width=2,

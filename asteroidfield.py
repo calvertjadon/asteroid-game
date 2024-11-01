@@ -1,3 +1,4 @@
+from typing import Sequence
 import pygame
 import random
 from asteriod import Asteroid
@@ -12,6 +13,7 @@ from constants import (
 
 
 class AsteroidField(pygame.sprite.Sprite):
+    containers: Sequence[pygame.sprite.Group]
     edges = [
         [
             pygame.Vector2(1, 0),
