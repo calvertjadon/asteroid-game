@@ -20,3 +20,7 @@ class CircleShape(pygame.sprite.Sprite, ABC):
 
     @abstractmethod
     def update(self, dt) -> None: ...
+
+    def is_colliding(self, other: "CircleShape") -> bool:
+        distance = self.position.distance_to(other.position)
+        return distance <= self.radius + other.radius
