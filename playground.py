@@ -1,5 +1,6 @@
+from abc import ABC
 import pygame
-from enum import Enum
+from enum import Enum, StrEnum, auto
 from dataclasses import dataclass
 from typing import Callable
 
@@ -26,7 +27,7 @@ class Event:
         for handler in self.__handlers:
             handler()
 
-    def add_handler(self, handler: Callable) -> None:
+    def add_ehandler(self, handler: Callable) -> None:
         self.__handlers.append(handler)
 
 
@@ -44,9 +45,9 @@ def draw_text(
     display.blit(text_surface, text_rect)
 
 
-class Menu:
+class Menu(ABC):
     __config: Config
-    __display: pygame.Surface
+    _display: pygame.Surface
     # __running: bool
     __cursor_rect: pygame.Rect  # for selecting menu items
 
@@ -54,26 +55,86 @@ class Menu:
 
     def __init__(self, display: pygame.Surface, config: Config) -> None:
         self.__config = config
-        self.__display = display
+        self._display = display
         # self.__running = True
         self.__cursor_rect = pygame.Rect(0, 0, 20, 20)
         # self.__offset = -100
         self.blit_screen = Event()
 
-    def __draw_cursor(self) -> None:
+    def _draw_text(self, text: str, center_pos: tuple[int, int]) -> None:
         draw_text(
-            display=self.__display,
-            text="*",
+            display=self._display,
+            text=text,
             font_name=self.__config.font_name,
             font_size=15,
-            center_pos=self.__cursor_rect.center,
+            center_pos=center_pos,
         )
 
-    def __blit_screen(self) -> None:
+    def _draw_cursor(self) -> None:
+        self._draw_text(text="*", center_pos=self.__cursor_rect.center)
+
+    def _blit_screen(self) -> None:
         self.blit_screen.invoke()
 
 
-class MainMenu: ...
+class GameState(StrEnum):
+    START = "Start"
+    OPTIONS = "Options"
+    CREDITS = "Credits"
+
+
+class CursorDirection(Enum):
+    UP = auto()
+    DOWN = auto()
+
+
+class MainMenu(Menu):
+    __state: GameState
+    __running: bool
+    __y_offset: int
+    __PADDING = 30
+
+    def __init__(self) -> None:
+        self.__state = GameState.START
+        self.__running = False
+        self.__y_offset = 0
+
+    def __get_center_pos(self) -> tuple[int, int]:
+        mid_x = self._display.get_width()
+        mid_y = self._display.get_height()
+        pos = int(mid_x / 2), int(mid_y / 2) + self.__y_offset
+        self.__y_offset += self.__PADDING
+        return pos
+
+    def display_menu(self) -> None:
+        self.__running = True
+
+        menu_opts = [(state, self.__get_center_pos()) for state in GameState]
+
+        while self.__running:
+            self.__check_events()
+            self._display.fill(Colors.DARK)
+            for opt in menu_opts:
+                self._draw_text(*opt)
+            self._draw_cursor()
+
+    def __move_cursor(self, direction: CursorDirection) -> None:
+        print(direction)
+
+    def __handle_keypress(self, key: int) -> None:
+        match key:
+            case pygame.constants.K_j:
+                self.__move_cursor(CursorDirection.DOWN)
+            case pygame.constants.K_k:
+                self.__move_cursor(CursorDirection.UP)
+
+    def __check_events(self) -> None:
+        for event in pygame.event.get():
+            match event.type:
+                case pygame.constants.QUIT:
+                    self.__running = False
+                case pygame.constants.KEYDOWN:
+                    self.__handle_keypress(event.key)
 
 
 class Game:
