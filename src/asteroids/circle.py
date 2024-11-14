@@ -1,26 +1,30 @@
 import pygame
 
-from datetime import timedelta
+from pygame.math import Vector2
 
-from asteroids.types import Coordinate
+from asteroids.entity import Entity
 
 
-class Circle(pygame.sprite.Sprite):
-    _center: Coordinate
-    _velocity: Coordinate
+class Circle(Entity):
+    _center: Vector2
+    _velocity: Vector2
     _radius: float
 
-    def __init__(
-        self, center: Coordinate, radius: float, *groups: pygame.sprite.Group
-    ) -> None:
-        super().__init__(*groups)
+    def __init__(self, center: Vector2, radius: float, velocity=None) -> None:
+        super().__init__()
 
         self._center = center
-        self._velocity = pygame.Vector2(0, 0)
+        self._velocity = velocity or pygame.Vector2(0, 0)
         self._radius = radius
 
-    def draw(self, surface: pygame.Surface) -> None:
-        pass
+    @property
+    def center(self) -> Vector2:
+        return self._center
 
-    def update(self, dt: timedelta) -> None:
-        pass
+    @property
+    def velocity(self) -> Vector2:
+        return self._velocity
+
+    @property
+    def radius(self) -> float:
+        return self._radius

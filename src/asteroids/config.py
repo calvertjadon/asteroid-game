@@ -1,11 +1,9 @@
-from datetime import timedelta
 from typing import Annotated, Any
 from pydantic import (
     BaseModel,
     Field,
     GetCoreSchemaHandler,
     GetJsonSchemaHandler,
-    field_validator,
 )
 from pydantic.json_schema import JsonSchemaValue
 from pydantic_core import CoreSchema, core_schema
@@ -82,20 +80,33 @@ class GameConfig(BaseModel):
 class WindowConfig(BaseModel):
     width: int = Field(default=1280)
     height: int = Field(default=720)
+    background_color: Color = Field(default="#000000")
 
     @property
     def center(self) -> pygame.Vector2:
         return pygame.Vector2(x=self.width / 2, y=self.height / 2)
 
+    @property
+    def size(self) -> tuple[int, int]:
+        return (self.width, self.height)
+
 
 class AsteroidConfig(BaseModel):
     min_radius: int = Field(default=20)
     kinds: int = Field(default=3)
-    spawn_rate: timedelta = Field(default_factory=lambda: timedelta(seconds=0.8))
+    spawn_rate: float = Field(default=0.8)
+    color: Color = Field(default="#ffffff")
 
     @property
     def max_radius(self) -> int:
         return self.min_radius * self.kinds
+
+
+class ShotConfig(BaseModel):
+    radius: float = Field(default=5)
+    speed: int = Field(default=500)
+    color: Color = Field(default="#ffffff")
+    cooldown: float = Field(default=0.3)
 
 
 class PlayerConfig(BaseModel):
@@ -103,6 +114,7 @@ class PlayerConfig(BaseModel):
     radius: float = Field(default=20)
     color: Color = Field(default="#ffffff")
     turn_speed: int = Field(default=300)
+    shot: ShotConfig = Field(default_factory=lambda: ShotConfig())
 
 
 class Config(BaseModel):
