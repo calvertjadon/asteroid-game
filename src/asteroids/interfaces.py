@@ -19,3 +19,8 @@ class IEventHandler(Protocol):
 
 class ISpriteManager(Protocol):
     def register(self, sprite: Sprite) -> None: ...
+
+
+class IGameManager(Protocol):
+    @property
+    def score(self) -> int: ...

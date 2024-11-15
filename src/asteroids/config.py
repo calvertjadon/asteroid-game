@@ -81,6 +81,7 @@ class WindowConfig(BaseModel):
     width: int = Field(default=1280)
     height: int = Field(default=720)
     background_color: Color = Field(default="#000000")
+    foreground_color: Color = Field(default="#ffffff")
 
     @property
     def center(self) -> pygame.Vector2:

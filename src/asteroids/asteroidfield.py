@@ -2,6 +2,7 @@ import random
 from typing import Callable
 from pygame import Vector2
 from pygame.event import Event
+from pygame.rect import Rect
 
 from asteroids.asteroid import Asteroid
 from asteroids.config import AsteroidConfig
@@ -12,34 +13,36 @@ from asteroids.events import CustomEvent
 class AsteroidField(Entity):
     __config: AsteroidConfig
     __spawn_timer: float
-    __max: Vector2
+    __bounds: Rect
     __edges: list[tuple[Vector2, Callable[[float], Vector2]]]
 
-    def __init__(self, max_: Vector2, config: AsteroidConfig) -> None:
+    def __init__(self, bounds: Rect, config: AsteroidConfig) -> None:
         super().__init__()
 
-        self.__max = max_
+        self.__bounds = bounds
         self.__spawn_timer = 0.0
         self.__config = config
         self.__edges = [
             (
                 Vector2(1, 0),
-                lambda y: Vector2(-self.__config.max_radius, y * self.__max.y),
+                lambda y: Vector2(-self.__config.max_radius, y * self.__bounds.bottom),
             ),
             (
                 Vector2(-1, 0),
                 lambda y: Vector2(
-                    self.__max.x + self.__config.max_radius, y * self.__max.y
+                    self.__bounds.right + self.__config.max_radius,
+                    y * self.__bounds.bottom,
                 ),
             ),
             (
                 Vector2(0, 1),
-                lambda x: Vector2(x * self.__max.x, -self.__config.max_radius),
+                lambda x: Vector2(x * self.__bounds.right, -self.__config.max_radius),
             ),
             (
                 Vector2(0, -1),
                 lambda x: Vector2(
-                    x * self.__max.x, self.__max.y + self.__config.max_radius
+                    x * self.__bounds.right,
+                    self.__bounds.bottom + self.__config.max_radius,
                 ),
             ),
         ]

@@ -1,6 +1,7 @@
-from pygame import Surface, Vector2
-import pygame
+from pygame import Surface
 from pygame.event import Event, post as post_event
+from pygame.math import Vector2
+from pygame.rect import Rect
 from pygame.sprite import Group
 
 from asteroids.asteroid import Asteroid
@@ -10,19 +11,20 @@ from asteroids.events import CustomEvent
 from asteroids.player import Player
 from asteroids.interfaces import IDrawable, IUpdatable
 from asteroids.shot import Shot
+from asteroids.entityfactory import EntityFactory
 
 
 def collided(e1: Circle, e2: Circle) -> bool:
     return e1.center.distance_to(e2.center) < e1.radius + e2.radius
 
 
-def out_of_bounds(circle: Circle, bounds: Vector2) -> bool:
+def out_of_bounds(circle: Circle, bounds: Rect) -> bool:
     return any(
         [
-            circle.center.x + circle.radius < 0,
-            circle.center.x - circle.radius > bounds.x,
-            circle.center.y + circle.radius < 0,
-            circle.center.y - circle.radius > bounds.y,
+            circle.center.x + circle.radius < bounds.left,
+            circle.center.x - circle.radius > bounds.right,
+            circle.center.y + circle.radius < bounds.top,
+            circle.center.y - circle.radius > bounds.bottom,
         ]
     )
 
@@ -30,17 +32,18 @@ def out_of_bounds(circle: Circle, bounds: Vector2) -> bool:
 class EntityManager:
     __updatable: Group
     __drawable: Group
-
+    __entity_factory: EntityFactory
     __entity_group_map: dict[type, list[Group]]
-    __screen_size: Vector2
+    __screen_size: Rect
 
-    def __init__(self, screen_size: Vector2) -> None:
+    def __init__(self, screen_size: Rect, entity_factory: EntityFactory) -> None:
         self.__updatable = Group()
         self.__drawable = Group()
         self.__player = Group()
         self.__asteroids = Group()
         self.__shots = Group()
 
+        self.__entity_factory = entity_factory
         self.__screen_size = screen_size
 
         self.__entity_group_map = {
@@ -86,14 +89,19 @@ class EntityManager:
                     asteroid.split()
 
     def reset(self) -> None:
-        for sprite in self.__updatable:
-            sprite.kill()
-        for sprite in self.__drawable:
-            sprite.kill()
+        # for sprite in self.__updatable:
+        #     sprite.kill()
+        # for sprite in self.__drawable:
+        #     sprite.kill()
         for sprite in self.__player:
             sprite.kill()
         for sprite in self.__asteroids:
             sprite.kill()
+        for sprite in self.__shots:
+            sprite.kill()
+
+        center = Vector2(self.__screen_size.center)
+        self.__entity_factory.create_player(center)
 
     def draw(self, surface: Surface) -> None:
         for sprite in self.__drawable:

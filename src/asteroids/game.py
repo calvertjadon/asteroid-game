@@ -1,78 +1,65 @@
 import pygame
+from pygame.event import Event
 
-from asteroids.asteroidfield import AsteroidField
-from asteroids.config import Config
 from asteroids.eventmanager import EventManager
 from asteroids.events import CustomEvent
-from asteroids.player import Player
+from asteroids.guimanager import GuiManager
 from asteroids.entitymanager import EntityManager
-from asteroids.inputmanager import InputManager
 
 
 class Game:
-    __config: Config
     __screen: pygame.Surface
     __entity_manager: EntityManager
     __event_manager: EventManager
+    __gui_manager: GuiManager
+    __fps: int
 
-    def __init__(self, config: Config) -> None:
-        self.__config = config
+    __game_over: bool
 
-        self.__entity_manager = EntityManager(pygame.Vector2(self.__config.window.size))
+    def __init__(
+        self,
+        entity_manager: EntityManager,
+        gui_manager: GuiManager,
+        screen: pygame.Surface,
+        event_manager: EventManager,
+        fps: int,
+    ) -> None:
+        self.__entity_manager = entity_manager
+        self.__gui_manager = gui_manager
+        self.__screen = screen
+        self.__event_manager = event_manager
+        self.__fps = fps
+        self.__game_over = False
 
-        self.__screen = pygame.display.set_mode(
-            (
-                self.__config.window.width,
-                self.__config.window.height,
-            )
-        )
+        self.__event_manager.register_handler(pygame.constants.QUIT, self)
+        self.__event_manager.register_handler(CustomEvent.GAME_OVER, self)
 
     def __draw_background(self) -> None:
-        self.__screen.fill(pygame.Color(self.__config.window.background_color))
+        self.__screen.fill(self.__gui_manager.bg_color)
+
+    def handle(self, event: Event) -> None:
+        assert event.type in (pygame.constants.QUIT, CustomEvent.GAME_OVER)
+
+        self.__game_over = True
 
     def run(self):
-        pygame.init()
         clock = pygame.time.Clock()
         dt: float = 0.0
 
-        self.__event_manager = EventManager()
-        self.__event_manager.register_handler(pygame.constants.KEYDOWN, InputManager())
-        self.__event_manager.register_handler(
-            CustomEvent.ENTITY_CREATED, self.__entity_manager
-        )
+        self.__entity_manager.reset()
 
-        Player(
-            center=self.__config.window.center,
-            config=self.__config.player,
-        )
-        asteroid_field = AsteroidField(
-            pygame.Vector2(self.__config.window.size),
-            self.__config.asteroid,
-        )
-        self.__event_manager.register_handler(
-            CustomEvent.ASTEROID_KILLED, asteroid_field
-        )
-
-        game_over = False
-        while not game_over:
+        self.__game_over = False
+        while not self.__game_over:
             for event in pygame.event.get():
-                if event.type == pygame.constants.QUIT:
-                    game_over = True
-
-                if event.type == CustomEvent.GAME_OVER:
-                    game_over = True
-
                 self.__event_manager.handle(event)
 
-            if not game_over:
-                self.__draw_background()
-                self.__entity_manager.update(dt)
-                self.__entity_manager.draw(self.__screen)
+            self.__draw_background()
+            self.__entity_manager.update(dt)
+            self.__entity_manager.draw(self.__screen)
+            self.__gui_manager.draw(self.__screen)
 
             pygame.display.flip()
-            dt = clock.tick(self.__config.game.fps) / 1000
-
-        self.__entity_manager.reset()
+            dt = clock.tick(self.__fps) / 1000
 
         running = True
         restart = False
