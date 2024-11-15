@@ -16,13 +16,13 @@ def collided(e1: Circle, e2: Circle) -> bool:
     return e1.center.distance_to(e2.center) < e1.radius + e2.radius
 
 
-def out_of_bounds(pos: Vector2, bounds: Vector2) -> bool:
+def out_of_bounds(circle: Circle, bounds: Vector2) -> bool:
     return any(
         [
-            pos.x < 0,
-            pos.x > bounds.x,
-            pos.y < 0,
-            pos.y > bounds.y,
+            circle.center.x + circle.radius < 0,
+            circle.center.x - circle.radius > bounds.x,
+            circle.center.y + circle.radius < 0,
+            circle.center.y - circle.radius > bounds.y,
         ]
     )
 
@@ -55,25 +55,17 @@ class EntityManager:
             if isinstance(entity, type_):
                 for group in groups:
                     group.add(entity)
-        print(entity)
 
     def update(self, dt: float) -> None:
         for sprite in self.__updatable:
             sprite: IUpdatable
             sprite.update(dt)
 
-        print(len(self.__shots))
-
         # check for off screen entities
         for shot in self.__shots:
             shot: Shot
-            if out_of_bounds(shot.center, self.__screen_size):
+            if out_of_bounds(shot, self.__screen_size):
                 shot.kill()
-
-        # for asteroid in self.__asteroids:
-        #     asteroid: Shot
-        #     if out_of_bounds(asteroid.center, self.__screen_size):
-        #         asteroid.kill()
 
         # check for player collisions
         for player in self.__player:
@@ -91,7 +83,7 @@ class EntityManager:
 
                 if collided(shot, asteroid):
                     shot.kill()
-                    asteroid.kill()
+                    asteroid.split()
 
     def reset(self) -> None:
         for sprite in self.__updatable:

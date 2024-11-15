@@ -1,10 +1,12 @@
 import random
 from typing import Callable
 from pygame import Vector2
+from pygame.event import Event
 
 from asteroids.asteroid import Asteroid
 from asteroids.config import AsteroidConfig
 from asteroids.entity import Entity
+from asteroids.events import CustomEvent
 
 
 class AsteroidField(Entity):
@@ -45,6 +47,29 @@ class AsteroidField(Entity):
     def spawn(self, radius: float, center: Vector2, velocity: Vector2) -> None:
         asteroid = Asteroid(center, radius, self.__config.color)
         asteroid._velocity = velocity
+
+    def handle(self, event: Event) -> None:
+        assert event.type == CustomEvent.ASTEROID_KILLED
+
+        old: Asteroid = event.asteroid
+        if old.radius <= self.__config.min_radius:
+            return
+
+        angle = random.uniform(20, 50)
+        v1 = Vector2(old.velocity).rotate(angle) * 1.2
+        v2 = Vector2(old.velocity).rotate(-angle)
+
+        self.spawn(
+            radius=old.radius - self.__config.min_radius,
+            center=Vector2(old.center),
+            velocity=v1,
+        )
+
+        self.spawn(
+            radius=old.radius - self.__config.min_radius,
+            center=Vector2(old.center),
+            velocity=v2,
+        )
 
     def update(self, dt: float) -> None:
         self.__spawn_timer += dt

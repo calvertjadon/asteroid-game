@@ -1,6 +1,9 @@
 import pygame
+from pygame.event import Event, post as post_event
+from pygame.math import Vector2
 
 from asteroids.circle import Circle
+from asteroids.events import CustomEvent
 
 
 class Asteroid(Circle):
@@ -21,3 +24,9 @@ class Asteroid(Circle):
 
     def update(self, dt: float) -> None:
         self._center += self._velocity * dt
+
+    def split(self) -> None:
+        self.kill()
+
+        event = Event(CustomEvent.ASTEROID_KILLED, asteroid=self)
+        post_event(event)

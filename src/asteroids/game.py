@@ -18,13 +18,7 @@ class Game:
     def __init__(self, config: Config) -> None:
         self.__config = config
 
-        self.__entity_manager = EntityManager(pygame.Vector2(config.window.size))
-
-        self.__event_manager = EventManager()
-        self.__event_manager.register_handler(pygame.constants.KEYDOWN, InputManager())
-        self.__event_manager.register_handler(
-            CustomEvent.ENTITY_CREATED, self.__entity_manager
-        )
+        self.__entity_manager = EntityManager(pygame.Vector2(self.__config.window.size))
 
         self.__screen = pygame.display.set_mode(
             (
@@ -38,17 +32,25 @@ class Game:
 
     def run(self):
         pygame.init()
-
         clock = pygame.time.Clock()
         dt: float = 0.0
+
+        self.__event_manager = EventManager()
+        self.__event_manager.register_handler(pygame.constants.KEYDOWN, InputManager())
+        self.__event_manager.register_handler(
+            CustomEvent.ENTITY_CREATED, self.__entity_manager
+        )
 
         Player(
             center=self.__config.window.center,
             config=self.__config.player,
         )
-        AsteroidField(
+        asteroid_field = AsteroidField(
             pygame.Vector2(self.__config.window.size),
             self.__config.asteroid,
+        )
+        self.__event_manager.register_handler(
+            CustomEvent.ASTEROID_KILLED, asteroid_field
         )
 
         game_over = False

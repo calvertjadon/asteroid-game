@@ -51,7 +51,6 @@ class Player(Circle):
 
     def __move(self, dt: float) -> None:
         forward = pygame.Vector2(0, 1).rotate(self.__rotation)
-        print("move")
         self._center += forward * self.__move_speed * dt
 
     def update(self, dt: float) -> None:
