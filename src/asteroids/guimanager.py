@@ -35,12 +35,27 @@ class GuiManager:
     def bg_color(self) -> Color:
         return self.__bg_color
 
-    def draw(self, surface: Surface) -> None:
-        score_text = self.__font.render(
-            f"Score: {self.__game_manager.score}", False, self.__fg_color
+    def __render_score(self) -> Surface:
+        return self.__font.render(
+            f"Score: {self.__game_manager.score}", True, self.__fg_color
         )
+
+    def __render_lives(self) -> Surface:
+        return self.__font.render(
+            f"Lives Remaining: {self.__game_manager.lives}", True, self.fg_color
+        )
+
+    def draw(self, surface: Surface) -> None:
+        score_text = self.__render_score()
         surface.blit(
             score_text,
-            [Vector2(self.__screen_size.center).x, 20],
+            [20, 20],
             score_text.get_rect(),
+        )
+
+        lives_text = self.__render_lives()
+        surface.blit(
+            lives_text,
+            [20, 40],
+            lives_text.get_rect(),
         )

@@ -74,7 +74,7 @@ class EntityManager:
         for player in self.__player:
             for asteroid in self.__asteroids:
                 if collided(player, asteroid):
-                    event = Event(CustomEvent.GAME_OVER)
+                    event = Event(CustomEvent.PLAYER_KILLED)
                     post_event(event)
 
         # check for bullet collisions

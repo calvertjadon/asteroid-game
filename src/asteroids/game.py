@@ -1,10 +1,9 @@
 import pygame
-from pygame.event import Event
 
 from asteroids.eventmanager import EventManager
-from asteroids.events import CustomEvent
 from asteroids.guimanager import GuiManager
 from asteroids.entitymanager import EntityManager
+from asteroids.interfaces import IGameManager
 
 
 class Game:
@@ -12,9 +11,8 @@ class Game:
     __entity_manager: EntityManager
     __event_manager: EventManager
     __gui_manager: GuiManager
+    __game_manager: IGameManager
     __fps: int
-
-    __game_over: bool
 
     def __init__(
         self,
@@ -22,25 +20,18 @@ class Game:
         gui_manager: GuiManager,
         screen: pygame.Surface,
         event_manager: EventManager,
+        game_manager: IGameManager,
         fps: int,
     ) -> None:
         self.__entity_manager = entity_manager
         self.__gui_manager = gui_manager
         self.__screen = screen
         self.__event_manager = event_manager
+        self.__game_manager = game_manager
         self.__fps = fps
-        self.__game_over = False
-
-        self.__event_manager.register_handler(pygame.constants.QUIT, self)
-        self.__event_manager.register_handler(CustomEvent.GAME_OVER, self)
 
     def __draw_background(self) -> None:
         self.__screen.fill(self.__gui_manager.bg_color)
-
-    def handle(self, event: Event) -> None:
-        assert event.type in (pygame.constants.QUIT, CustomEvent.GAME_OVER)
-
-        self.__game_over = True
 
     def run(self):
         clock = pygame.time.Clock()
@@ -48,18 +39,23 @@ class Game:
 
         self.__entity_manager.reset()
 
-        self.__game_over = False
-        while not self.__game_over:
+        while not self.__game_manager.round_over:
             for event in pygame.event.get():
                 self.__event_manager.handle(event)
 
+            if not self.__game_manager.round_over:
+                self.__entity_manager.update(dt)
+
             self.__draw_background()
-            self.__entity_manager.update(dt)
-            self.__entity_manager.draw(self.__screen)
             self.__gui_manager.draw(self.__screen)
+            self.__entity_manager.draw(self.__screen)
 
             pygame.display.flip()
             dt = clock.tick(self.__fps) / 1000
+
+        if not self.__game_manager.game_over:
+            self.__game_manager.start_round()
+            return self.run()
 
         running = True
         restart = False
@@ -76,6 +72,7 @@ class Game:
                         running = False
 
         if restart:
+            self.__game_manager.reset()
             return self.run()
 
         pygame.quit()

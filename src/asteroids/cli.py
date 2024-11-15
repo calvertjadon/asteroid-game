@@ -37,7 +37,9 @@ def main():
     event_manager.register_handler(pygame.constants.KEYDOWN, input_manager)
     event_manager.register_handler(CustomEvent.ENTITY_CREATED, entity_manager)
     event_manager.register_handler(CustomEvent.ASTEROID_KILLED, game_manager)
+    event_manager.register_handler(pygame.constants.QUIT, game_manager)
     event_manager.register_handler(CustomEvent.ASTEROID_KILLED, asteroid_field)
+    event_manager.register_handler(CustomEvent.PLAYER_KILLED, game_manager)
 
     screen = pygame.display.set_mode((config.window.width, config.window.height))
 
@@ -46,6 +48,7 @@ def main():
         gui_manager=gui_manager,
         screen=screen,
         event_manager=event_manager,
+        game_manager=game_manager,
         fps=config.game.fps,
     )
     game.run()
