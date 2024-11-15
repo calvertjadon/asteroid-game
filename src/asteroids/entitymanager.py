@@ -8,6 +8,7 @@ from asteroids.asteroid import Asteroid
 from asteroids.asteroidfield import AsteroidField
 from asteroids.circle import Circle
 from asteroids.events import CustomEvent
+from asteroids.explosion import Particle
 from asteroids.player import Player
 from asteroids.interfaces import IDrawable, IUpdatable
 from asteroids.shot import Shot
@@ -29,6 +30,9 @@ def out_of_bounds(circle: Circle, bounds: Rect) -> bool:
     )
 
 
+MIN_LIFETIME = 5
+
+
 class EntityManager:
     __updatable: Group
     __drawable: Group
@@ -42,15 +46,28 @@ class EntityManager:
         self.__player = Group()
         self.__asteroids = Group()
         self.__shots = Group()
+        self.__particles = Group()
+        self.__despawnable = Group()
 
         self.__entity_factory = entity_factory
         self.__screen_size = screen_size
 
         self.__entity_group_map = {
             Player: [self.__updatable, self.__drawable, self.__player],
-            Asteroid: [self.__updatable, self.__drawable, self.__asteroids],
+            Asteroid: [
+                self.__updatable,
+                self.__drawable,
+                self.__asteroids,
+                self.__despawnable,
+            ],
             AsteroidField: [self.__updatable],
-            Shot: [self.__updatable, self.__drawable, self.__shots],
+            Shot: [self.__updatable, self.__drawable, self.__shots, self.__despawnable],
+            Particle: [
+                self.__updatable,
+                self.__drawable,
+                self.__particles,
+                self.__despawnable,
+            ],
         }
 
     def register(self, entity: IUpdatable | IDrawable) -> None:
@@ -65,10 +82,15 @@ class EntityManager:
             sprite.update(dt)
 
         # check for off screen entities
-        for shot in self.__shots:
-            shot: Shot
-            if out_of_bounds(shot, self.__screen_size):
-                shot.kill()
+        for entity in self.__despawnable:
+            entity: Shot
+            if all(
+                [
+                    out_of_bounds(entity, self.__screen_size),
+                    entity.age > MIN_LIFETIME,
+                ]
+            ):
+                entity.kill()
 
         # check for player collisions
         for player in self.__player:
@@ -81,11 +103,11 @@ class EntityManager:
         for asteroid in self.__asteroids:
             asteroid: Asteroid
 
-            for shot in self.__shots:
-                shot: Shot
+            for entity in self.__shots:
+                entity: Shot
 
-                if collided(shot, asteroid):
-                    shot.kill()
+                if collided(entity, asteroid):
+                    entity.kill()
                     asteroid.split()
 
     def reset(self) -> None:

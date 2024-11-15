@@ -18,4 +18,5 @@ class Shot(Circle):
         )
 
     def update(self, dt: float) -> None:
+        super().update(dt)
         self._center += self.velocity * dt

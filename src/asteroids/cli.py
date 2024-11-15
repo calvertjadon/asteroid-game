@@ -41,7 +41,9 @@ def main():
     event_manager.register_handler(CustomEvent.ASTEROID_KILLED, asteroid_field)
     event_manager.register_handler(CustomEvent.PLAYER_KILLED, game_manager)
 
-    screen = pygame.display.set_mode((config.window.width, config.window.height))
+    screen = pygame.display.set_mode(
+        (config.window.width, config.window.height), pygame.BLEND_RGBA_MULT
+    )
 
     game = Game(
         entity_manager=entity_manager,

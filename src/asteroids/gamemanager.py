@@ -20,7 +20,6 @@ class GameManager:
         self.__round_over = False
 
     def __handle_player_killed(self) -> None:
-        print("player killed")
         if not self.__round_over:
             self.__lives -= 1
 

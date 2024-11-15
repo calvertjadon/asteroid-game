@@ -48,8 +48,7 @@ class AsteroidField(Entity):
         ]
 
     def spawn(self, radius: float, center: Vector2, velocity: Vector2) -> None:
-        asteroid = Asteroid(center, radius, self.__config.color)
-        asteroid._velocity = velocity
+        Asteroid(center, radius, self.__config.color, velocity)
 
     def handle(self, event: Event) -> None:
         assert event.type == CustomEvent.ASTEROID_KILLED
@@ -75,6 +74,8 @@ class AsteroidField(Entity):
         )
 
     def update(self, dt: float) -> None:
+        super().update(dt)
+
         self.__spawn_timer += dt
         if self.__spawn_timer > self.__config.spawn_rate:
             self.__spawn_timer = 0.0
