@@ -80,8 +80,13 @@ class GameConfig(BaseModel):
 class WindowConfig(BaseModel):
     width: int = Field(default=1280)
     height: int = Field(default=720)
-    background_color: Color = Field(default="#000000")
-    foreground_color: Color = Field(default="#ffffff")
+    # background_color: Color = Field(default="#000000")
+    background_color: Color = Field(default="#24283b")
+    foreground_color: Color = Field(default="#c0caf5")
+    star_colors: list[Color] = Field(
+        default=["#545c7e", "#737aa2", "#a9b1d6", "#1f2335"]
+    )
+    num_stars: int = Field(default=100)
 
     @property
     def center(self) -> pygame.Vector2:
@@ -96,7 +101,8 @@ class AsteroidConfig(BaseModel):
     min_radius: int = Field(default=20)
     kinds: int = Field(default=3)
     spawn_rate: float = Field(default=0.8)
-    color: Color = Field(default="#ffffff")
+    color: Color = Field(default="#9d7cd8")
+    particle_colors: list[Color] = Field(default=["#9d7cd8"])
 
     @property
     def max_radius(self) -> int:
@@ -106,14 +112,14 @@ class AsteroidConfig(BaseModel):
 class ShotConfig(BaseModel):
     radius: float = Field(default=5)
     speed: int = Field(default=500)
-    color: Color = Field(default="#ffffff")
+    color: Color = Field(default="#f7768e")
     cooldown: float = Field(default=0.3)
 
 
 class PlayerConfig(BaseModel):
     move_speed: int = Field(default=200)
     radius: float = Field(default=20)
-    color: Color = Field(default="#ffffff")
+    color: Color = Field(default="#7aa2f7")
     turn_speed: int = Field(default=300)
     shot: ShotConfig = Field(default_factory=lambda: ShotConfig())
 

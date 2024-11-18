@@ -13,6 +13,7 @@ from asteroids.player import Player
 from asteroids.interfaces import IDrawable, IUpdatable
 from asteroids.shot import Shot
 from asteroids.entityfactory import EntityFactory
+from asteroids.stars import Star, StarField
 
 
 def collided(e1: Circle, e2: Circle) -> bool:
@@ -48,6 +49,7 @@ class EntityManager:
         self.__shots = Group()
         self.__particles = Group()
         self.__despawnable = Group()
+        self.__stars = Group()
 
         self.__entity_factory = entity_factory
         self.__screen_size = screen_size
@@ -68,6 +70,7 @@ class EntityManager:
                 self.__particles,
                 self.__despawnable,
             ],
+            Star: [self.__drawable, self.__stars],
         }
 
     def register(self, entity: IUpdatable | IDrawable) -> None:

@@ -1,11 +1,13 @@
 from enum import Enum
 import pygame
+from pygame.color import Color
 from pygame.math import Vector2
 
 from asteroids.circle import Circle
 from asteroids.config import PlayerConfig, ShotConfig
 from asteroids.shot import Shot
 from asteroids.types import Triangle
+from asteroids.weapons import Arsenal, _MultiWeapon, _StandardWeapon, WeaponType
 
 
 class Direction(int, Enum):
@@ -17,18 +19,18 @@ class Direction(int, Enum):
 
 class Player(Circle):
     __color: pygame.Color
-    __turn_speed: int
-    __move_speed: int
     __rotation: float
-    __shot_speed: float
-    __shot_radius: float
-    __shot_cooldown: float
+    # __shot_speed: float
+    # __shot_radius: float
+    # __shot_cooldown: float
+    # __shot_color: Color
     __shot_timer: float
     __move_accel: float
     __move_decel: float
     __max_move_speed: float
     __current_move_speed: float
     __move_direction: Direction
+    __arsenal: Arsenal
 
     def __init__(
         self,
@@ -38,11 +40,11 @@ class Player(Circle):
         super().__init__(center, config.radius)
 
         self.__color = config.color
-        self.__turn_speed = config.turn_speed
         self.__rotation = 45
-        self.__shot_speed = config.shot.speed
-        self.__shot_radius = config.shot.radius
-        self.__shot_cooldown = config.shot.cooldown
+        # self.__shot_speed = config.shot.speed
+        # self.__shot_radius = config.shot.radius
+        # self.__shot_cooldown = config.shot.cooldown
+        # self.__shot_color = config.shot.color
         self.__shot_timer = 0
 
         self.__move_accel = 10
@@ -56,6 +58,14 @@ class Player(Circle):
         self.__current_turn_speed = 0
         self.__max_turn_speed = config.turn_speed
         self.__turn_direction = Direction.CLOCKWISE
+
+        self.__arsenal = Arsenal(self, config.shot.color)
+        self.__arsenal.equip(self.__arsenal.create(WeaponType.MULTI))
+        self.__arsenal.equip(self.__arsenal.create(WeaponType.SPRAY))
+
+    @property
+    def rotation(self) -> float:
+        return self.__rotation
 
     def __get_triangle(self) -> Triangle:
         forward = pygame.Vector2(0, 1).rotate(self.__rotation)
@@ -71,7 +81,6 @@ class Player(Circle):
         )
 
     def __rotate(self, dt: float) -> None:
-        print(self.__current_turn_speed, self.__turn_direction)
         self.__rotation += (
             dt * self.__current_turn_speed * self.__turn_direction
         ) % 360
@@ -81,7 +90,7 @@ class Player(Circle):
         self._center += forward * self.__current_move_speed * dt * self.__move_direction
 
     def update(self, dt: float) -> None:
-        self.__shot_timer = max(0, self.__shot_timer - dt)
+        self.__arsenal.update(dt)
 
         keys = pygame.key.get_pressed()
 
@@ -134,10 +143,11 @@ class Player(Circle):
             self.shoot()
 
     def shoot(self) -> None:
-        if self.__shot_timer > 0:
-            return
-
-        velocity = pygame.Vector2(0, 1).rotate(self.__rotation) * self.__shot_speed
-        center = Vector2(self.center)
-        Shot(center, self.__shot_radius, velocity)
-        self.__shot_timer += self.__shot_cooldown
+        # if self.__shot_timer > 0:
+        #     return
+        #
+        # velocity = pygame.Vector2(0, 1).rotate(self.__rotation) * self.__shot_speed
+        # center = Vector2(self.center)
+        # Shot(center, self.__shot_radius, velocity, self.__shot_color)
+        # self.__shot_timer += self.__shot_cooldown
+        self.__arsenal.active_weapon.shoot()

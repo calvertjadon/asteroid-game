@@ -48,7 +48,13 @@ class AsteroidField(Entity):
         ]
 
     def spawn(self, radius: float, center: Vector2, velocity: Vector2) -> None:
-        Asteroid(center, radius, self.__config.color, velocity)
+        Asteroid(
+            center,
+            radius,
+            self.__config.color,
+            velocity,
+            self.__config.particle_colors,
+        )
 
     def handle(self, event: Event) -> None:
         assert event.type == CustomEvent.ASTEROID_KILLED

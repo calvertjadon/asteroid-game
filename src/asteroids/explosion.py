@@ -19,6 +19,7 @@ class Particle(Circle):
         lifespan: float,
         speed: float,
         radius: float,
+        color: Color,
     ) -> None:
         MIN_RADIUS = 3
         MAX_RADIUS = 15
@@ -28,6 +29,7 @@ class Particle(Circle):
 
         self.__lifespan = lifespan
         self.__speed = speed
+        self.__color = color
 
     def update(self, dt: float) -> None:
         self.__lifespan -= dt
@@ -40,10 +42,10 @@ class Particle(Circle):
         self._center += self.velocity * dt * self.__speed
 
     def draw(self, surface: Surface) -> None:
-        pygame.draw.circle(surface, "#ffffff", self.center, self.radius)
+        pygame.draw.circle(surface, self.__color, self.center, self.radius)
 
 
-def create_explosion(circle: Circle, num_particles: int) -> None:
+def create_explosion(circle: Circle, num_particles: int, colors: list[Color]) -> None:
     MIN_LIFESPAN = 1
     MAX_LIFESPAN = 3
 
@@ -59,4 +61,5 @@ def create_explosion(circle: Circle, num_particles: int) -> None:
             lifespan,
             speed,
             circle.radius * 0.1,
+            random.choice(colors),
         )

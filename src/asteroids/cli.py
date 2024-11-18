@@ -10,6 +10,7 @@ from asteroids.game import Game
 from asteroids.gamemanager import GameManager
 from asteroids.guimanager import GuiManager
 from asteroids.inputmanager import InputManager
+from asteroids.stars import Star, StarField
 
 
 def main():
@@ -40,6 +41,11 @@ def main():
     event_manager.register_handler(pygame.constants.QUIT, game_manager)
     event_manager.register_handler(CustomEvent.ASTEROID_KILLED, asteroid_field)
     event_manager.register_handler(CustomEvent.PLAYER_KILLED, game_manager)
+
+    starfield = StarField(window_rect, config.window.star_colors)
+
+    for _ in range(config.window.num_stars):
+        starfield.create_star()
 
     screen = pygame.display.set_mode(
         (config.window.width, config.window.height), pygame.BLEND_RGBA_MULT
