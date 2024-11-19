@@ -45,7 +45,66 @@ class GuiManager:
             f"Lives Remaining: {self.__game_manager.lives}", True, self.fg_color
         )
 
+    def game_over(self, surface: Surface) -> None:
+        surface.fill(self.bg_color)
+
+        game_over_text = self.__font.render(
+            "Game Over",
+            True,
+            self.__fg_color,
+        )
+        restart_text = self.__font.render(
+            "Press ENTER to restart", True, self.__fg_color
+        )
+        quit_text = self.__font.render("Press ESCAPE to quit", True, self.__fg_color)
+        center = Vector2(self.__screen_size.center)
+        surface.blit(
+            game_over_text,
+            center - (game_over_text.get_width() / 2, 0),
+            game_over_text.get_rect(),
+        )
+
+        surface.blit(
+            restart_text,
+            center - (restart_text.get_width() / 2, -30),
+            restart_text.get_rect(),
+        )
+
+        surface.blit(
+            quit_text,
+            center - (quit_text.get_width() / 2, -60),
+            quit_text.get_rect(),
+        )
+
+    def new_game(self, surface: Surface) -> None:
+        surface.fill(self.bg_color)
+
+        title_text = self.__font.render(
+            "Asteroids",
+            True,
+            self.__fg_color,
+        )
+        start_text = self.__font.render("Press ENTER to start", True, self.__fg_color)
+        quit_text = self.__font.render("Press ESCAPE to quit", True, self.__fg_color)
+        center = Vector2(self.__screen_size.center)
+
+        surface.blit(
+            title_text, center - (title_text.get_width() / 2, 0), title_text.get_rect()
+        )
+        surface.blit(
+            start_text,
+            center - (start_text.get_width() / 2, -30),
+            start_text.get_rect(),
+        )
+        surface.blit(
+            quit_text,
+            center - (quit_text.get_width() / 2, -60),
+            quit_text.get_rect(),
+        )
+
     def draw(self, surface: Surface) -> None:
+        surface.fill(self.bg_color)
+
         score_text = self.__render_score()
         surface.blit(
             score_text,

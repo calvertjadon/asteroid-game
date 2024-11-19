@@ -50,14 +50,14 @@ def main():
 
     _ = ItemManager(window_rect)
 
-    screen = pygame.display.set_mode(
+    window = pygame.display.set_mode(
         (config.window.width, config.window.height), pygame.BLEND_RGBA_MULT
     )
 
     game = Game(
         entity_manager=entity_manager,
         gui_manager=gui_manager,
-        screen=screen,
+        window=window,
         event_manager=event_manager,
         game_manager=game_manager,
         fps=config.game.fps,

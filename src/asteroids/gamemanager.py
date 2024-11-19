@@ -15,7 +15,7 @@ class GameManager:
 
     def __init__(self) -> None:
         self.__score = 0
-        self.__lives = 3
+        self.__lives = self.__DEFAULT_LIVES
         self.__game_over = False
         self.__round_over = False
 

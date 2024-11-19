@@ -41,4 +41,3 @@ class WeaponItem(Item):
     def equip(self, weilder: _Weilder) -> None:
         weapon = weilder.arsenal.create(self.__weapon_type)
         weilder.arsenal.equip(weapon)
-        print(weilder.arsenal)

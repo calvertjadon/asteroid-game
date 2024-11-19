@@ -1,5 +1,4 @@
 from pygame import Surface
-from pygame.color import Color
 from pygame.event import Event, post as post_event
 from pygame.math import Vector2
 from pygame.rect import Rect
@@ -11,13 +10,12 @@ from asteroids.circle import Circle
 from asteroids.events import CustomEvent
 from asteroids.explosion import Particle
 from asteroids.itemmanager import ItemManager
-from asteroids.items import Item, WeaponItem
+from asteroids.items import Item
 from asteroids.player import Player
 from asteroids.interfaces import IDrawable, IUpdatable
 from asteroids.shot import Shot
 from asteroids.entityfactory import EntityFactory
-from asteroids.stars import Star, StarField
-from asteroids.weapons import WeaponType
+from asteroids.stars import Star
 
 
 def collided(e1: Circle, e2: Circle) -> bool:
@@ -160,3 +158,4 @@ class EntityManager:
         match event.type:
             case CustomEvent.ENTITY_CREATED:
                 self.register(event.entity)
+                print("registered", event.entity)

@@ -41,7 +41,6 @@ class ItemManager(Entity):
             return
 
         self.__itemtimer = max(0, self.__itemtimer - dt)
-        print(self.__itemtimer)
         if not self.__can_spawn():
             return
 

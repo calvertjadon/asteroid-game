@@ -80,4 +80,5 @@ class StarField:
 
         star_type = random.choice(self.__star_types)
         size = random.uniform(2, 8)
-        star_type(pos, color, size)
+        star = star_type(pos, color, size)
+        print(star)
