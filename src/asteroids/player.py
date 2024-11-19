@@ -60,8 +60,13 @@ class Player(Circle):
         self.__turn_direction = Direction.CLOCKWISE
 
         self.__arsenal = Arsenal(self, config.shot.color)
-        self.__arsenal.equip(self.__arsenal.create(WeaponType.MULTI))
-        self.__arsenal.equip(self.__arsenal.create(WeaponType.SPRAY))
+        # self.__arsenal.equip(self.__arsenal.create(WeaponType.MULTI))
+        # self.__arsenal.equip(self.__arsenal.create(WeaponType.SPRAY))
+        #
+
+    @property
+    def arsenal(self) -> Arsenal:
+        return self.__arsenal
 
     @property
     def rotation(self) -> float:

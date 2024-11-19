@@ -10,6 +10,7 @@ from asteroids.game import Game
 from asteroids.gamemanager import GameManager
 from asteroids.guimanager import GuiManager
 from asteroids.inputmanager import InputManager
+from asteroids.itemmanager import ItemManager
 from asteroids.stars import Star, StarField
 
 
@@ -46,6 +47,8 @@ def main():
 
     for _ in range(config.window.num_stars):
         starfield.create_star()
+
+    _ = ItemManager(window_rect)
 
     screen = pygame.display.set_mode(
         (config.window.width, config.window.height), pygame.BLEND_RGBA_MULT

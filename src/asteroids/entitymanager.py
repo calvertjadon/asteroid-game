@@ -1,4 +1,5 @@
 from pygame import Surface
+from pygame.color import Color
 from pygame.event import Event, post as post_event
 from pygame.math import Vector2
 from pygame.rect import Rect
@@ -9,11 +10,14 @@ from asteroids.asteroidfield import AsteroidField
 from asteroids.circle import Circle
 from asteroids.events import CustomEvent
 from asteroids.explosion import Particle
+from asteroids.itemmanager import ItemManager
+from asteroids.items import Item, WeaponItem
 from asteroids.player import Player
 from asteroids.interfaces import IDrawable, IUpdatable
 from asteroids.shot import Shot
 from asteroids.entityfactory import EntityFactory
 from asteroids.stars import Star, StarField
+from asteroids.weapons import WeaponType
 
 
 def collided(e1: Circle, e2: Circle) -> bool:
@@ -50,6 +54,8 @@ class EntityManager:
         self.__particles = Group()
         self.__despawnable = Group()
         self.__stars = Group()
+        self.__items = Group()
+        self.__item_manager = Group()
 
         self.__entity_factory = entity_factory
         self.__screen_size = screen_size
@@ -71,6 +77,8 @@ class EntityManager:
                 self.__despawnable,
             ],
             Star: [self.__drawable, self.__stars],
+            Item: [self.__drawable, self.__items],
+            ItemManager: [self.__updatable, self.__item_manager],
         }
 
     def register(self, entity: IUpdatable | IDrawable) -> None:
@@ -83,6 +91,11 @@ class EntityManager:
         for sprite in self.__updatable:
             sprite: IUpdatable
             sprite.update(dt)
+
+        if len(self.__items) == 0:
+            for item_manager in self.__item_manager:
+                item_manager: ItemManager
+                item_manager.update(dt)
 
         # check for off screen entities
         for entity in self.__despawnable:
@@ -113,6 +126,14 @@ class EntityManager:
                     entity.kill()
                     asteroid.split()
 
+        for player in self.__player:
+            player: Player
+            for item in self.__items:
+                item: Item
+                if collided(player, item):
+                    item.kill()
+                    item.equip(player)
+
     def reset(self) -> None:
         # for sprite in self.__updatable:
         #     sprite.kill()
@@ -123,6 +144,8 @@ class EntityManager:
         for sprite in self.__asteroids:
             sprite.kill()
         for sprite in self.__shots:
+            sprite.kill()
+        for sprite in self.__items:
             sprite.kill()
 
         center = Vector2(self.__screen_size.center)
